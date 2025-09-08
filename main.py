@@ -69,7 +69,7 @@ def get_headers(cookie_string: str) -> Dict[str, str]:
     }
 
 
-def build_url(zip_code: str, max_dealers: int = 50) -> str:
+def build_url(zip_code: str, max_dealers: int = 50, year: int = 2025) -> str:
     """
     Build the Honda API URL with the given parameters.
 
@@ -82,13 +82,13 @@ def build_url(zip_code: str, max_dealers: int = 50) -> str:
     """
     return (
         "https://automobiles.honda.com/platform/api/v3/inventoryAndDealers"
-        f"?productDivisionCode=A&modelYear=2025&modelGroup=odyssey"
+        f"?productDivisionCode=A&modelYear={year}&modelGroup=odyssey"
         f"&zipCode={zip_code}&maxDealers={max_dealers}&preferredDealerId=&showOnlineRetailingURL=true"
     )
 
 
 def fetch_inventory_data(
-    zip_code: str, max_dealers: int, cookie_string: str
+    zip_code: str, max_dealers: int, cookie_string: str, year: int = 2025
 ) -> Dict[str, Any]:
     """
     Fetch inventory data from Honda API.
@@ -104,7 +104,7 @@ def fetch_inventory_data(
     Raises:
         requests.RequestException: If the API request fails
     """
-    url = build_url(zip_code, max_dealers)
+    url = build_url(zip_code, max_dealers, year)
     headers = get_headers(cookie_string)
 
     response = requests.get(url, headers=headers, timeout=30)
@@ -208,7 +208,7 @@ def iter_inventory_rows(data: Dict[str, Any]) -> Generator[Dict[str, Any], None,
 
 
 def get_honda_odyssey_inventory(
-    zip_code: str, max_dealers: int = 50, cookie_string: str = None
+    zip_code: str, max_dealers: int = 50, cookie_string: str = None, year: int = 2025
 ) -> pd.DataFrame:
     """
     Main function to fetch Honda Odyssey inventory data.
@@ -232,24 +232,23 @@ def get_honda_odyssey_inventory(
     if cookie_string is None:
         cookie_string = load_cookie()
 
-    data = fetch_inventory_data(zip_code, max_dealers, cookie_string)
+    data = fetch_inventory_data(zip_code, max_dealers, cookie_string, year)
 
     df = pd.DataFrame([row for row in iter_inventory_rows(data)])
+    df['year'] = year
 
     return df
 
 
-def main():
+def main(zip_code: str, max_dealers: int = 50, year: int = 2025):
     """
     Example usage of the Honda Odyssey inventory tool.
     """
-    # Example usage
-    zip_code = "78723"
-    max_dealers = 50
+
 
     try:
         # The function will automatically load the cookie from .cookie file
-        df = get_honda_odyssey_inventory(zip_code, max_dealers)
+        df = get_honda_odyssey_inventory(zip_code, max_dealers, year=year)
         print(f"Found {len(df)} Honda Odyssey vehicles")
         print("\nFirst 5 results:")
         print(df.head())
