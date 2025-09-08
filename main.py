@@ -235,7 +235,7 @@ def get_honda_odyssey_inventory(
     data = fetch_inventory_data(zip_code, max_dealers, cookie_string, year)
 
     df = pd.DataFrame([row for row in iter_inventory_rows(data)])
-    df['year'] = year
+    df["year"] = year
 
     return df
 
@@ -244,7 +244,6 @@ def main(zip_code: str, max_dealers: int = 50, year: int = 2025):
     """
     Example usage of the Honda Odyssey inventory tool.
     """
-
 
     try:
         # The function will automatically load the cookie from .cookie file
