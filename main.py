@@ -181,8 +181,10 @@ def iter_inventory_rows(data: Dict[str, Any]) -> Generator[Dict[str, Any], None,
             item.get("ExteriorColor") or item.get("ModelBaseColor") or "(Unknown color)"
         )
         price = format_price(item.get("ModelMSRP"))
+
         trim = item.get("ModelTrim", "")
         inv_type = item.get("InventoryType", "")
+        interior_color = item.get("InteriorColor", "")
 
         for vin_entry in item.get("VINs", []):
             vin = vin_entry.get("VIN")
@@ -204,6 +206,7 @@ def iter_inventory_rows(data: Dict[str, Any]) -> Generator[Dict[str, Any], None,
                 "color": color,
                 "vin": vin,
                 "price": price,
+                "interior_color": interior_color,
             }
 
 
